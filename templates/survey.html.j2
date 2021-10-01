@@ -29,6 +29,10 @@
                 console.log(`Latitude : ${crd.latitude}`);
                 console.log(`Longitude: ${crd.longitude}`);
                 console.log(`More or less ${crd.accuracy} meters.`);
+
+                document.getElementById('user_latitude').value = crd.latitude;
+                document.getElementById('user_longitude').value = crd.longitude;
+                document.getElementById('user_accuracy').value = crd.accuracy;
             }
 
             function error(err) {
@@ -44,8 +48,6 @@
 
         <form method="post" action="{{ url_for('submit_survey') }}">
 
-            <input type="hidden" id="user_location" name="user_location" value="{%- if location is defined and location != None -%}{{ location }}{%- endif -%}">
-
             <label for="user_phone">Name:</label>
             <input type="text" id="user_name" name="user_name" minlength="2" maxlength="50" required><br>
 
@@ -54,6 +56,10 @@
 
             <label for="user_phone">Phone:</label>
             <input type="tel" id="user_name" name="user_phone" minlength="7" maxlength="20"><br>
+
+            <input type="hidden" id="user_latitude" name="user_latitude">
+            <input type="hidden" id="user_longitude" name="user_longitude">
+            <input type="hidden" id="user_accuracy" name="user_accuracy">
 
             <input type="submit" value="Enter to WIN!">
 

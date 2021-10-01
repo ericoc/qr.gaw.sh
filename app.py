@@ -8,7 +8,16 @@ def display_survey():
 
 @app.route('/submit', methods=['POST'])
 def submit_survey():
-    return render_template('thanks.html.j2', name=request.form['user_name'], email=request.form['user_email'], phone=request.form['user_phone'])
+    return render_template('thanks.html.j2',
+        name = request.form['user_name'],
+        email = request.form['user_email'],
+        phone = request.form['user_phone'],
+        ip_address = request.remote_addr,
+        user_agent = request.user_agent,
+        latitude = request.form['user_latitude'],
+        longitude = request.form['user_longitude'],
+        accuracy = request.form['user_accuracy']
+    )
 
 @app.route('/icon.png', methods=['GET'])
 def static_from_root():
