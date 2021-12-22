@@ -16,6 +16,19 @@
         <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
         <title>Enter to WIN!</title>
         <script>
+
+            function checkVals() {
+                var name_field = document.getElementById('user_name');
+                var email_field = document.getElementById('user_email');
+                var accuracy_field = document.getElementById('user_accuracy');
+                var button = document.getElementById('submit');
+                if ( (name_field.value != '' ) && (email_field.value != '') && (accuracy_field != '') ) {
+                    button.disabled = false;
+                } else {
+                    button.disabled = true;
+                }
+            }
+
             var options = {
                 enableHighAccuracy: true,
                 timeout: 5000,
@@ -48,20 +61,20 @@
 
         <form method="post" action="{{ url_for('submit_survey') }}">
 
-            <label for="user_phone">Name:</label>
-            <input type="text" id="user_name" name="user_name" minlength="2" maxlength="50" required><br>
+            <label for="user_name">Name:</label>
+            <input type="text" id="user_name" name="user_name" minlength="2" maxlength="50" onfocus="javascript:checkVals()" onkeyup="javascript:checkVals()" required><br>
 
             <label for="user_email">E-mail:</label>
-            <input type="email" id="user_email" name="user_email" minlength="5" maxlength="50"><br>
+            <input type="email" id="user_email" name="user_email" minlength="5" maxlength="50" onfocus="javascript:checkVals()" onkeyup="javascript:checkVals()" required><br>
 
             <label for="user_phone">Phone:</label>
-            <input type="tel" id="user_name" name="user_phone" minlength="7" maxlength="20"><br>
+            <input type="tel" id="user_phone" name="user_phone" minlength="7" maxlength="15"><br>
 
             <input type="hidden" id="user_latitude" name="user_latitude">
             <input type="hidden" id="user_longitude" name="user_longitude">
             <input type="hidden" id="user_accuracy" name="user_accuracy">
 
-            <input type="submit" value="Enter to WIN!">
+            <input type="submit" id="submit" value="Enter to WIN!" disabled>
 
         </form>
 
