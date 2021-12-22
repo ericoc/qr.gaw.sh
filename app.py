@@ -9,6 +9,7 @@ app = Flask(__name__)
 Main page
 """
 @app.route('/')
+@app.route('/submit', methods=['GET'])
 def display_survey():
 
     # Thank them if they have already completed the survey
@@ -76,6 +77,13 @@ def lost(message='Page not found'):
     return make_response(render_template('sorry.html.j2', error_message=message), 404)
 
 """
+Handle HTTP 405 error responses
+"""
+@app.errorhandler(405)
+def nicetry(message='Method not allowed'):
+    return make_response(render_template('sorry.html.j2', error_message=message), 405)
+
+"""
 Handle new survey form submissions
 """
 @app.route('/submit', methods=['POST'])
@@ -94,9 +102,9 @@ def submit_survey():
         else:
             return error_page(message='Please enter a valid name', code=400)
 
-        # Validate the e-mail address
+        # Validate the e-mail address and make sure it is lowercase
         if 'user_email' in request.form and re.match('^[a-zA-Z0-9\-\+]+@[a-zA-Z0-9\-]+\.[a-zA-Z]{2,6}$', request.form['user_email']):
-            email = request.form['user_email']
+            email = request.form['user_email'].lower()
         else:
             return error_page(message='Please enter a valid e-mail address', code=400)
 
@@ -143,6 +151,19 @@ def submit_survey():
             print(e)
             return error_page(message='Cannot connect to database', code=500)
 
+        # Check that the e-mail address has not already been added to InfluxDB in the past day
+        try:
+            client.switch_database(secrets.db_database)
+            find_email = f"SELECT \"name\" FROM \"{secrets.db_database}\" WHERE email = '\"{email}\"' AND time > now() - 1d LIMIT 1"
+            results = client.query(find_email)
+
+            if (len(results.items())) > 0:
+                return error_page(message='Please limit yourself to one entry per day', code=425)
+
+        except:
+            print(e)
+            return error_page(message='There was an error determining your e-mail eligibility', code=500)
+
         # Insert the data to InfluxDB
         try:
             write_data = f"{secrets.db_database},email=\"{email}\" name=\"{name}\",ip=\"{request.remote_addr}\",latitude={latitude},longitude={longitude},accuracy={accuracy}"
@@ -151,14 +172,15 @@ def submit_survey():
             if phone:
                 write_data +=f",phone={phone}"
 
-            print(f"\n{write_data}\n\n")
-
             if client.write(write_data, params={'db': secrets.db_database}, protocol='line'):
                 return response
 
         except Exception as e:
             print(e)
             return error_page(message='Cannot write to database', code=500)
+
+    else:
+        return error_page(message='Invalid request', code=400)
 
 
 if __name__ == "__main__":
