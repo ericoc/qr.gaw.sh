@@ -1,7 +1,6 @@
 from flask import Flask, render_template, send_from_directory, request, make_response
 import secrets
 import re
-import datetime
 from influxdb import InfluxDBClient
 
 app = Flask(__name__)
