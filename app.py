@@ -103,7 +103,7 @@ def submit_survey():
             return error_page(message='Please enter a valid name', code=400)
 
         # Validate the e-mail address and make sure it is lowercase
-        if 'user_email' in request.form and re.match('^[a-zA-Z0-9\-\+]+@[a-zA-Z0-9\-]+\.[a-zA-Z]{2,6}$', request.form['user_email']):
+        if 'user_email' in request.form and re.match('^[a-zA-Z0-9_\-\+]+@[a-zA-Z0-9\-]+\.[a-zA-Z]{2,6}$', request.form['user_email']):
             email = request.form['user_email'].lower()
         else:
             return error_page(message='Please enter a valid e-mail address', code=400)
